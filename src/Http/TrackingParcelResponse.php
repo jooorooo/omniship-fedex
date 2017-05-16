@@ -9,7 +9,9 @@
 namespace Omniship\FedEx\Http;
 
 use Carbon\Carbon;
-use Omniship\Common\ShippingServiceBag;
+use Omniship\Common\Component;
+use Omniship\Common\EventBag;
+use Omniship\Common\TrackingBag;
 use Omniship\Message\AbstractResponse;
 
 class TrackingParcelResponse extends AbstractResponse
@@ -20,37 +22,26 @@ class TrackingParcelResponse extends AbstractResponse
     protected $xml;
 
     /**
-     * @return ShippingServiceBag
+     * @return TrackingBag
      */
     public function getData()
     {
-
-        print_r($this->data);exit;
-        
-        $result = new ShippingServiceBag();
+        $result = new TrackingBag();
         if(!is_null($this->getCode())) {
             return $result;
         }
 
-        if(!empty($this->data->RateReplyDetails)) {
-            foreach($this->data->RateReplyDetails AS $quote) {
-                if(!empty($quote->RatedShipmentDetails)) {
-                    foreach($quote->RatedShipmentDetails AS $shipment_details) {
-                        $result->add([
-                            'id' => $quote->ServiceType,
-                            'name' => $quote->ServiceType,
-                            'description' => !empty($quote->CommitDetails->DeliveryMessages) ? $quote->CommitDetails->DeliveryMessages : '',
-                            'price' => $shipment_details->ShipmentRateDetail->TotalNetChargeWithDutiesAndTaxes->Amount,
-//                            'pickup_date' => null,
-//                            'pickup_time' => null,
-                            'delivery_date' => !empty($quote->DeliveryTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->DeliveryTimestamp, $this->request->getReceiverTimeZone()) : null,
-                            'delivery_time' => !empty($quote->DeliveryTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->DeliveryTimestamp, $this->request->getReceiverTimeZone()) : null,
-                            'currency' => $shipment_details->ShipmentRateDetail->TotalNetChargeWithDutiesAndTaxes->Currency,
-                            'tax' => $shipment_details->ShipmentRateDetail->TotalTaxes->Amount,
-                            'insurance' => 0
-                        ]);
-                    }
-                }
+        if(!empty($this->data->TrackDetails)) {
+            foreach($this->data->TrackDetails AS $quote) {
+                $result->add([
+                    'id' => $quote->TrackingNumberUniqueIdentifier,
+                    'name' => ($name = (!empty($quote->DestinationAddress) ? $this->_getDestinationAddress($quote->DestinationAddress) : null)),
+                    'events' => null,//$this->_getEvents($quote),
+                    'shipment_date' => Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->ShipTimestamp),
+                    'estimated_delivery_date' => !empty($quote->ActualDeliveryTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:sP', $quote->ActualDeliveryTimestamp) : null,
+                    'origin_service_area' => null,
+                    'destination_service_area' => $name ? new Component(['id' => md5(json_encode($quote->DestinationAddress)), 'name' => $name]) : null,
+                ]);
             }
         }
         return $result;
@@ -68,7 +59,7 @@ class TrackingParcelResponse extends AbstractResponse
                         return $notification->LocalizedMessage;
                     }
                 }
-            } elseif(empty($this->data->RateReplyDetails)) {
+            } elseif(empty($this->data->TrackDetails)) {
                 return $this->data->Notifications->LocalizedMessage;
             }
         }
@@ -87,11 +78,46 @@ class TrackingParcelResponse extends AbstractResponse
                         return $notification->Code;
                     }
                 }
-            } elseif(empty($this->data->RateReplyDetails)) {
+            } elseif(empty($this->data->TrackDetails)) {
                 return $this->data->Notifications->Code;
             }
         }
         return null;
+    }
+
+    /**
+     * @param $xml
+     * @return EventBag
+     */
+    protected function _getEvents($xml)
+    {
+        $result = new EventBag();
+        if($xml->ShipmentEvent) {
+            foreach($xml->ShipmentEvent AS $event) {
+                $result->add(new Component([
+                    'id' => (string)$event->ServiceEvent->EventCode,
+                    'name' => (string)$event->ServiceEvent->Description,
+                ]));
+            }
+        }
+        return $result;
+    }
+
+    protected function _getDestinationAddress($data) {
+        $return = [];
+        if(!empty($data->CountryCode)) {
+            $return[] = $data->CountryCode;
+            if(!empty($data->StateOrProvinceCode)) {
+                $return[] = $data->StateOrProvinceCode;
+                if(!empty($data->City)) {
+                    $return[] = $data->City;
+                    if(!empty($data->Residential)) {
+                        $return[] = $data->Residential;
+                    }
+                }
+            }
+        }
+        return implode(', ', $return);
     }
 
 }

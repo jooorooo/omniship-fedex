@@ -27,8 +27,9 @@ class ShippingServicesRequest extends AbstractRequest
         $rateRequest->WebAuthenticationDetail->UserCredential->Password = $this->getPassword();
         $rateRequest->ClientDetail->AccountNumber = $this->getUsername();
         $rateRequest->ClientDetail->MeterNumber = $this->getMeter();
+        $rateRequest->ClientDetail->Localization->LanguageCode = $this->getLanguageCode();
 
-        $rateRequest->TransactionDetail->CustomerTransactionId = 'testing rate service request';
+        $rateRequest->TransactionDetail->CustomerTransactionId = $this->getTransactionId();
 
         //version
         $rateRequest->Version->ServiceId = 'crs';

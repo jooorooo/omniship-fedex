@@ -10,47 +10,41 @@ namespace Omniship\FedEx\Http;
 
 use FedEx\TrackService\Request;
 use FedEx\TrackService\ComplexType;
-use FedEx\TrackService\SimpleType\EMailNotificationFormatType;
+use FedEx\TrackService\SimpleType\TrackIdentifierType;
 
 class TrackingParcelRequest extends AbstractRequest
 {
     /**
-     * @return ComplexType\TrackNotificationRequest
+     * @return ComplexType\TrackRequest
      */
     public function getData() {
-        $trackNotificationRequest = new ComplexType\TrackNotificationRequest();
+        $trackRequest = new ComplexType\TrackRequest();
 
         //authentication & client details
-        $trackNotificationRequest->WebAuthenticationDetail->UserCredential->Key = $this->getKey();
-        $trackNotificationRequest->WebAuthenticationDetail->UserCredential->Password = $this->getPassword();
-        $trackNotificationRequest->ClientDetail->AccountNumber = $this->getUsername();
-        $trackNotificationRequest->ClientDetail->MeterNumber = $this->getMeter();
+        $trackRequest->WebAuthenticationDetail->UserCredential->Key = $this->getKey();
+        $trackRequest->WebAuthenticationDetail->UserCredential->Password = $this->getPassword();
+        $trackRequest->ClientDetail->AccountNumber = $this->getUsername();
+        $trackRequest->ClientDetail->MeterNumber = $this->getMeter();
+        $trackRequest->ClientDetail->Localization->LanguageCode = $this->getLanguageCode();
+
+        $trackRequest->TransactionDetail->CustomerTransactionId = $this->getTransactionId();
 
         //version
-        $trackNotificationRequest->Version->ServiceId = 'trck';
-        $trackNotificationRequest->Version->Major = 5;
-        $trackNotificationRequest->Version->Minor = 0;
-        $trackNotificationRequest->Version->Intermediate = 0;
+        $trackRequest->Version->ServiceId = 'trck';
+        $trackRequest->Version->Major = 5;
+        $trackRequest->Version->Minor = 0;
+        $trackRequest->Version->Intermediate = 0;
 
-        $trackNotificationRequest->setSenderEMailAddress('test@test.com');
-        $trackNotificationRequest->setSenderContactName('mr Test');
-        $trackNotificationRequest->TrackingNumber = $this->getParcelId();
+        $trackRequest->PackageIdentifier->Type = TrackIdentifierType::_TRACKING_NUMBER_OR_DOORTAG;
+        $trackRequest->PackageIdentifier->Value = $this->getParcelId();
 
-        $notification_detail = new ComplexType\EMailNotificationDetail();
-
-        $recipient = new ComplexType\EMailNotificationRecipient();
-        $recipient->EMailAddress = 'test2@test.com';
-        $recipient->Format = EMailNotificationFormatType::_HTML;
-        $notification_detail->setRecipients([$recipient]);
-        $trackNotificationRequest->setNotificationDetail($notification_detail);
-
-        return $trackNotificationRequest;
+        return $trackRequest;
     }
 
     public function sendData($data) {
         $rateServiceRequest = new Request();
         $rateServiceRequest->getSoapClient()->__setLocation($this->getEndpoint());
-        $response = $rateServiceRequest->getGetTrackNotificationReply($data);
+        $response = $rateServiceRequest->getTrackReply($data);
 
         return $this->createResponse($response);
     }
