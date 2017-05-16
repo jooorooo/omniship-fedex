@@ -13,6 +13,7 @@ use Omniship\Common\Component;
 use Omniship\Common\EventBag;
 use Omniship\Common\TrackingBag;
 use Omniship\Message\AbstractResponse;
+use Symfony\Component\Translation\Loader\PhpFileLoader;
 
 class TrackingParcelResponse extends AbstractResponse
 {
@@ -36,8 +37,8 @@ class TrackingParcelResponse extends AbstractResponse
                 $result->add([
                     'id' => $quote->TrackingNumberUniqueIdentifier,
                     'name' => ($name = (!empty($quote->DestinationAddress) ? $this->_getDestinationAddress($quote->DestinationAddress) : null)),
-                    'events' => null,//$this->_getEvents($quote),
-                    'shipment_date' => Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->ShipTimestamp),
+                    'events' => $this->_getEvents($quote),
+                    'shipment_date' => !empty($quote->ShipTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->ShipTimestamp) : null,
                     'estimated_delivery_date' => !empty($quote->ActualDeliveryTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:sP', $quote->ActualDeliveryTimestamp) : null,
                     'origin_service_area' => null,
                     'destination_service_area' => $name ? new Component(['id' => md5(json_encode($quote->DestinationAddress)), 'name' => $name]) : null,
@@ -86,19 +87,17 @@ class TrackingParcelResponse extends AbstractResponse
     }
 
     /**
-     * @param $xml
+     * @param $data
      * @return EventBag
      */
-    protected function _getEvents($xml)
+    protected function _getEvents($data)
     {
         $result = new EventBag();
-        if($xml->ShipmentEvent) {
-            foreach($xml->ShipmentEvent AS $event) {
-                $result->add(new Component([
-                    'id' => (string)$event->ServiceEvent->EventCode,
-                    'name' => (string)$event->ServiceEvent->Description,
-                ]));
-            }
+        if(!empty($data->Notification)) {
+            $result->add(new Component([
+                'id' => $data->Notification->Severity,
+                'name' => $data->Notification->LocalizedMessage,
+            ]));
         }
         return $result;
     }
@@ -106,7 +105,7 @@ class TrackingParcelResponse extends AbstractResponse
     protected function _getDestinationAddress($data) {
         $return = [];
         if(!empty($data->CountryCode)) {
-            $return[] = $data->CountryCode;
+            $return[] = $this->getCountryName($data->CountryCode);
             if(!empty($data->StateOrProvinceCode)) {
                 $return[] = $data->StateOrProvinceCode;
                 if(!empty($data->City)) {

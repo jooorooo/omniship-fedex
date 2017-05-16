@@ -20,7 +20,8 @@ class Gateway extends AbstractGateway
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -28,7 +29,8 @@ class Gateway extends AbstractGateway
      * @param $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -49,7 +51,8 @@ class Gateway extends AbstractGateway
     /**
      * @return mixed
      */
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->getParameter('username');
     }
 
@@ -57,14 +60,16 @@ class Gateway extends AbstractGateway
      * @param $value
      * @return $this
      */
-    public function setUsername($value) {
+    public function setUsername($value)
+    {
         return $this->setParameter('username', $value);
     }
 
     /**
      * @return mixed
      */
-    public function getPassword() {
+    public function getPassword()
+    {
         return $this->getParameter('password');
     }
 
@@ -72,14 +77,16 @@ class Gateway extends AbstractGateway
      * @param $value
      * @return $this
      */
-    public function setPassword($value) {
+    public function setPassword($value)
+    {
         return $this->setParameter('password', $value);
     }
 
     /**
      * @return mixed
      */
-    public function getMeter() {
+    public function getMeter()
+    {
         return $this->getParameter('meter');
     }
 
@@ -87,14 +94,16 @@ class Gateway extends AbstractGateway
      * @param $value
      * @return $this
      */
-    public function setMeter($value) {
+    public function setMeter($value)
+    {
         return $this->setParameter('meter', $value);
     }
 
     /**
      * @return mixed
      */
-    public function getKey() {
+    public function getKey()
+    {
         return $this->getParameter('key');
     }
 
@@ -102,7 +111,8 @@ class Gateway extends AbstractGateway
      * @param $value
      * @return $this
      */
-    public function setKey($value) {
+    public function setKey($value)
+    {
         return $this->setParameter('key', $value);
     }
 
@@ -110,7 +120,8 @@ class Gateway extends AbstractGateway
      * @param array $parameters
      * @return \Omniship\Message\AbstractRequest
      */
-    public function getServices(array $parameters = []) {
+    public function getServices(array $parameters = [])
+    {
         return $this->createRequest(ShippingServicesRequest::class, $this->getParameters() + $parameters);
     }
 
@@ -118,7 +129,8 @@ class Gateway extends AbstractGateway
      * @param array $parameters
      * @return \Omniship\Message\AbstractRequest
      */
-    public function trackingParcel(array $parameters = []) {
+    public function trackingParcel(array $parameters = [])
+    {
         return $this->createRequest(TrackingParcelRequest::class, $this->getParameters() + $parameters);
     }
 }
