@@ -13,6 +13,7 @@ use FedEx\RateService\ComplexType;
 use FedEx\RateService\Request;
 use FedEx\RateService\SimpleType;
 use Omniship\Common\ItemBag;
+use Omniship\Common\ShippingService;
 
 class ShippingServicesRequest extends AbstractRequest
 {
