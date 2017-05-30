@@ -18,7 +18,7 @@ use Omniship\Common\ShippingService;
 class ShippingServicesRequest extends AbstractRequest
 {
     /**
-     * @return GetQuote
+     * @return ComplexType\RateRequest
      */
     public function getData() {
         $rateRequest = new ComplexType\RateRequest();

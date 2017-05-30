@@ -44,7 +44,8 @@ class ShippingServicesResponse extends AbstractResponse
                             'delivery_time' => !empty($quote->DeliveryTimestamp) ? Carbon::createFromFormat('Y-m-d\TH:i:s', $quote->DeliveryTimestamp, $this->request->getReceiverTimeZone()) : null,
                             'currency' => $shipment_details->ShipmentRateDetail->TotalNetChargeWithDutiesAndTaxes->Currency,
                             'tax' => $shipment_details->ShipmentRateDetail->TotalTaxes->Amount,
-                            'insurance' => 0
+                            'insurance' => 0,
+                            'exchange_rate' => !empty($shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate) ? (float)$shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate : null
                         ]);
                     }
                 }
