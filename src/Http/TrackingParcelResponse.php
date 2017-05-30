@@ -34,7 +34,7 @@ class TrackingParcelResponse extends AbstractResponse
 
         if(!empty($this->data->TrackDetails)) {
             foreach($this->data->TrackDetails AS $quote) {
-                $result->add([
+                $result->push([
                     'id' => $quote->TrackingNumberUniqueIdentifier,
                     'name' => ($name = (!empty($quote->DestinationAddress) ? $this->_getDestinationAddress($quote->DestinationAddress) : null)),
                     'events' => $this->_getEvents($quote),
@@ -94,7 +94,7 @@ class TrackingParcelResponse extends AbstractResponse
     {
         $result = new EventBag();
         if(!empty($data->Notification)) {
-            $result->add(new Component([
+            $result->push(new Component([
                 'id' => $data->Notification->Severity,
                 'name' => $data->Notification->LocalizedMessage,
             ]));

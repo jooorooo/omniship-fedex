@@ -75,7 +75,7 @@ class ShippingServicesRequest extends AbstractRequest
         $rateRequest->RequestedShipment->RequestedPackageLineItems = [];
         /** @var $items ItemBag */
         $items = $this->getItems();
-        if($items) {
+        if($items->count()) {
             foreach($items->all() as $item) {
                 $piece = new ComplexType\RequestedPackageLineItem();
                 $piece->Weight->Value = $item->getWeight();
