@@ -8,12 +8,13 @@
 
 namespace Omniship\FedEx\Http;
 
-use DHL\Entity\AM\GetQuote;
 use FedEx\RateService\ComplexType;
 use FedEx\RateService\Request;
 use FedEx\RateService\SimpleType;
 use Omniship\Common\ItemBag;
-use Omniship\Common\ShippingService;
+use Omniship\FedEx\Helper\Convert;
+use Crisu83\Conversion\Quantity\Mass\Unit AS MassUnit;
+use Crisu83\Conversion\Quantity\Length\Unit AS LengthUnit;
 
 class ShippingServicesRequest extends AbstractRequest
 {
@@ -21,6 +22,8 @@ class ShippingServicesRequest extends AbstractRequest
      * @return ComplexType\RateRequest
      */
     public function getData() {
+        $convert = new Convert();
+
         $rateRequest = new ComplexType\RateRequest();
 
         //authentication & client details
@@ -78,12 +81,12 @@ class ShippingServicesRequest extends AbstractRequest
         if($items->count()) {
             foreach($items->all() as $item) {
                 $piece = new ComplexType\RequestedPackageLineItem();
-                $piece->Weight->Value = $item->getWeight();
-                $piece->Weight->Units = $this->getWeightUnit() == 'KG' ? SimpleType\WeightUnits::_KG : SimpleType\WeightUnits::_LB;
-                $piece->Dimensions->Length = $item->getDepth();
-                $piece->Dimensions->Width = $item->getWidth();
-                $piece->Dimensions->Height = $item->getHeight();
-                $piece->Dimensions->Units = $this->getDimensionUnit() == 'CM' ? SimpleType\LinearUnits::_CM : SimpleType\LinearUnits::_IN;
+                $piece->Weight->Value = $convert->convertWeightUnit($item->getWeight(), $this->getWeightUnit());
+                $piece->Weight->Units = $convert->validateWeightUnit($this->getWeightUnit()) == MassUnit::KILOGRAM ? SimpleType\WeightUnits::_KG : SimpleType\WeightUnits::_LB;
+                $piece->Dimensions->Length = $convert->convertLengthUnit($item->getDepth(), $this->getDimensionUnit());
+                $piece->Dimensions->Width = $convert->convertLengthUnit($item->getWidth(), $this->getDimensionUnit());
+                $piece->Dimensions->Height = $convert->convertLengthUnit($item->getHeight(), $this->getDimensionUnit());
+                $piece->Dimensions->Units = $convert->validateLengthUnit($this->getDimensionUnit()) == LengthUnit::CENTIMETRE ? SimpleType\LinearUnits::_CM : SimpleType\LinearUnits::_IN;
                 $piece->GroupPackageCount = $item->getQuantity();
                 $rateRequest->RequestedShipment->RequestedPackageLineItems[] = $piece;
 
