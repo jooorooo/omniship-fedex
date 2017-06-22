@@ -72,7 +72,7 @@ class ShippingServicesRequest extends AbstractRequest
 //        $rateRequest->RequestedShipment->RateRequestTypes = [SimpleType\RateRequestType::_ACCOUNT, SimpleType\RateRequestType::_LIST];
         $rateRequest->RequestedShipment->RateRequestTypes = [SimpleType\RateRequestType::_ACCOUNT, SimpleType\RateRequestType::_LIST];
 
-        $rateRequest->RequestedShipment->PackageCount = 0;
+        $rateRequest->RequestedShipment->PackageCount = $this->getNumberOfPieces();
 
         //create package line items
         $rateRequest->RequestedShipment->RequestedPackageLineItems = [];
@@ -89,8 +89,6 @@ class ShippingServicesRequest extends AbstractRequest
                 $piece->Dimensions->Units = $convert->validateLengthUnit($this->getDimensionUnit()) == LengthUnit::CENTIMETRE ? SimpleType\LinearUnits::_CM : SimpleType\LinearUnits::_IN;
                 $piece->GroupPackageCount = $item->getQuantity();
                 $rateRequest->RequestedShipment->RequestedPackageLineItems[] = $piece;
-
-                $rateRequest->RequestedShipment->PackageCount += $item->getQuantity();
             }
         }
 

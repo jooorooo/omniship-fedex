@@ -8,10 +8,10 @@
 
 namespace Omniship\FedEx\Http;
 
-use Omniship\Exceptions\InvalidResponseException;
+use Omniship\Interfaces\RequestInterface;
 use Omniship\Message\AbstractRequest AS BaseAbstractRequest;
 
-abstract class AbstractRequest extends BaseAbstractRequest
+abstract class AbstractRequest extends BaseAbstractRequest implements RequestInterface
 {
 
     /**
