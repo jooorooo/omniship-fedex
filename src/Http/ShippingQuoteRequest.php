@@ -16,7 +16,7 @@ use Omniship\FedEx\Helper\Convert;
 use Crisu83\Conversion\Quantity\Mass\Unit AS MassUnit;
 use Crisu83\Conversion\Quantity\Length\Unit AS LengthUnit;
 
-class ShippingServicesRequest extends AbstractRequest
+class ShippingQuoteRequest extends AbstractRequest
 {
     /**
      * @return ComplexType\RateRequest
@@ -105,11 +105,11 @@ class ShippingServicesRequest extends AbstractRequest
 
     /**
      * @param $data
-     * @return ShippingServicesResponse
+     * @return ShippingQuoteResponse
      */
     protected function createResponse($data)
     {
-        return $this->response = new ShippingServicesResponse($this, $data);
+        return $this->response = new ShippingQuoteResponse($this, $data);
     }
 
     /**

@@ -8,7 +8,7 @@
 
 namespace Omniship\FedEx;
 
-use Omniship\FedEx\Http\ShippingServicesRequest;
+use Omniship\FedEx\Http\ShippingQuoteRequest;
 use Omniship\FedEx\Http\TrackingParcelRequest;
 use Omniship\Common\AbstractGateway;
 
@@ -118,11 +118,11 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return ShippingServicesRequest
+     * @return ShippingQuoteRequest
      */
     public function getQuotes(array $parameters = [])
     {
-        return $this->createRequest(ShippingServicesRequest::class, $this->getParameters() + $parameters);
+        return $this->createRequest(ShippingQuoteRequest::class, $this->getParameters() + $parameters);
     }
 
     /**
