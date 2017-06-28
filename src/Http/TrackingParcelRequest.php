@@ -36,7 +36,7 @@ class TrackingParcelRequest extends AbstractRequest
         $trackRequest->Version->Intermediate = 0;
 
         $trackRequest->PackageIdentifier->Type = TrackIdentifierType::_TRACKING_NUMBER_OR_DOORTAG;
-        $trackRequest->PackageIdentifier->Value = $this->getParcelId();
+        $trackRequest->PackageIdentifier->Value = $this->getBolId();
 
         return $trackRequest;
     }
