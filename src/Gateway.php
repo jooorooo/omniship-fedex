@@ -126,11 +126,11 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     * @param string $bol_id
      * @return TrackingParcelRequest
      */
-    public function trackingParcel(array $parameters = [])
+    public function trackingParcel($bol_id)
     {
-        return $this->createRequest(TrackingParcelRequest::class, $this->getParameters() + $parameters);
+        return $this->createRequest(TrackingParcelRequest::class, $this->setBolId($bol_id)->getParameters());
     }
 }
