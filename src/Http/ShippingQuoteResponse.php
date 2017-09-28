@@ -10,6 +10,7 @@ namespace Omniship\FedEx\Http;
 
 use Carbon\Carbon;
 use Omniship\Common\ShippingQuoteBag;
+use Omniship\Consts;
 use Omniship\Message\AbstractResponse;
 
 class ShippingQuoteResponse extends AbstractResponse
@@ -45,7 +46,8 @@ class ShippingQuoteResponse extends AbstractResponse
                             'currency' => $shipment_details->ShipmentRateDetail->TotalNetChargeWithDutiesAndTaxes->Currency,
                             'tax' => $shipment_details->ShipmentRateDetail->TotalTaxes->Amount,
                             'insurance' => 0,
-                            'exchange_rate' => !empty($shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate) ? (float)$shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate : null
+                            'exchange_rate' => !empty($shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate) ? (float)$shipment_details->ShipmentRateDetail->CurrencyExchangeRate->Rate : null,
+                            'payer' => $this->getRequest()->getPayer() ? : Consts::PAYER_SENDER
                         ]);
                     }
                 }
