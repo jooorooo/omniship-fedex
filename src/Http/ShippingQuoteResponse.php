@@ -34,6 +34,7 @@ class ShippingQuoteResponse extends AbstractResponse
             foreach($this->data->RateReplyDetails AS $quote) {
                 if(!empty($quote->RatedShipmentDetails)) {
                     foreach($quote->RatedShipmentDetails AS $shipment_details) {
+                        var_dump($shipment_details); exit;
                         $result->push([
                             'id' => $quote->ServiceType,
                             'name' => $quote->ServiceType,
