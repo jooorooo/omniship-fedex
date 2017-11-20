@@ -117,11 +117,17 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * @param array $parameters
+     * @param array|ShippingQuoteRequest $parameters
      * @return ShippingQuoteRequest
      */
-    public function getQuotes(array $parameters = [])
+    public function getQuotes($parameters = [])
     {
+        if($parameters instanceof ShippingQuoteRequest) {
+            return $parameters;
+        }
+        if(!is_array($parameters)) {
+            $parameters = [];
+        }
         return $this->createRequest(ShippingQuoteRequest::class, $this->getParameters() + $parameters);
     }
 
